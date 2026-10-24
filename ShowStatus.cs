@@ -1,0 +1,26 @@
+using System;
+
+namespace Console_RPG;
+
+/*
+    ShowStatus 负责展示玩家当前状态面板。
+*/
+public class ShowStatus
+{
+    /*
+        显示玩家当前状态
+    */
+    public static void ShowPlayerStatus()
+    {
+        ConsoleHelper.Clear();
+        Console.WriteLine($"你的名字是：{PlayerStatistics.Name}");
+        Console.WriteLine($"等级：{PlayerStatistics.Level}");
+        Console.WriteLine($"Exp:{PlayerStatistics.Exp}/{PlayerStatistics.ExpToNextLevel}");
+        Console.WriteLine($"HP：{PlayerStatistics.Hp:F0}/{PlayerStatistics.MaxHp:F0}");
+        Console.WriteLine($"攻击值：{PlayerStatistics.Attack}");
+        Console.WriteLine($"治疗量：{PlayerStatistics.Treatment}");
+        Console.WriteLine($"距离升级还差：{PlayerStatistics.ExpToNextLevel - PlayerStatistics.Exp} 经验");
+
+        Program.Loading();
+    }
+}
