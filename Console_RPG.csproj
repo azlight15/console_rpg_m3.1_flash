@@ -5,6 +5,14 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <!-- 版本号与 GameInfo.cs 中的版本保持一致 -->
+        <Version>1.1.0</Version>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <FileVersion>1.1.0.0</FileVersion>
+        <Product>Console_RPG</Product>
+        <Authors>AzLight15</Authors>
+        <Description>Console_RPG - 控制台回合制 RPG（Flash 版）</Description>
     </PropertyGroup>
 
 </Project>

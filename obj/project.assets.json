@@ -11,13 +11,13 @@
     "C:\\Users\\wlcl0\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg-main\\Console_RPG.csproj",
+      "projectUniqueName": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg_m3.1_flash-main\\Console_RPG.csproj",
       "projectName": "Console_RPG",
-      "projectPath": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg-main\\Console_RPG.csproj",
+      "projectPath": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg_m3.1_flash-main\\Console_RPG.csproj",
       "packagesPath": "C:\\Users\\wlcl0\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg-main\\obj\\",
+      "outputPath": "C:\\Users\\wlcl0\\OneDrive\\桌面\\console_rpg_m3.1_flash-main\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\wlcl0\\AppData\\Roaming\\NuGet\\NuGet.Config"

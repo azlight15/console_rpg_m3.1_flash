@@ -35,6 +35,7 @@ public static class Program
     {
         ConsoleHelper.Clear();
         Console.WriteLine("===== 欢迎来玩Console RPG游戏 =====");
+        Console.WriteLine($"当前版本：{GameInfo.FullVersion}");
         Console.WriteLine("此游戏是控制台游戏，没有ui");
         Console.WriteLine("那么接下来请好好享受游戏吧！");
         Console.WriteLine("=================================");
@@ -81,7 +82,7 @@ public static class Program
         {
             ConsoleHelper.Clear();
             Console.WriteLine("=========================");
-            Console.WriteLine("Console RPG");
+            Console.WriteLine($"Console RPG  ({GameInfo.FullVersion})");
             Console.WriteLine("请选择选项：");
             Console.WriteLine("1.开始对战");
             Console.WriteLine("2.打坐修炼");

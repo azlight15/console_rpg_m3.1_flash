@@ -126,7 +126,21 @@ public static class Program
 
 ***
 
-## 最近一次改动
+### 10.`GameInfo.cs`
+
+版本信息的唯一来源：
+
+* `Version`：版本号，当前为 `1.1.0`
+* `VersionName`：版本名称，当前为 `Flash`
+* `FullVersion`：完整标识，例如 `Flash v1.1.0`
+
+开始界面、主菜单标题与程序集属性（`Console_RPG.csproj` 中的 `Version`）都取自这里。
+
+***
+
+## v1.1.0 改动记录
+
+当前版本：**Flash v1.1.0**
 
 ### 修复的问题
 

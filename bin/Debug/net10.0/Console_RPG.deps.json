@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "Console_RPG/1.0.0": {
+      "Console_RPG/1.1.0": {
         "runtime": {
           "Console_RPG.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "Console_RPG/1.0.0": {
+    "Console_RPG/1.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
