@@ -1,8 +1,10 @@
+using System;
+
 namespace Console_RPG;
 
 /*
     PlayerStatistics 用于保存玩家的全局状态数据。
-    包含等级、经验、血量、攻击力等核心属性。
+    包含等级、经验、血量、攻击力、草药数量等核心属性。
     所有战斗、升级、治疗、存档模块都会直接读取或修改这里的数据。
 */
 public static class PlayerStatistics
@@ -21,6 +23,19 @@ public static class PlayerStatistics
     public static double Hp = 100;       // 当前血量
     public static double MaxHp = 100;    // 最大血量
     public static double Attack = 15;    // 攻击力
+
+    /*
+        草药数量：治疗的核心资源。
+        菜单与战斗中的每次治疗都会消耗 1 株草药，
+        避免"无限嗑药零风险"成为最优解。
+        初始赠送 3 株，升级时 +1，击杀怪物有概率掉落。
+    */
+    public static int Herbs = 3;
+
+    /*
+        草药持有上限，避免囤积导致后期完全无压力。
+    */
+    public const int MaxHerbs = 10;
 
     /*
         每次治疗恢复的血量。
@@ -52,15 +67,64 @@ public static class PlayerStatistics
     public const double DeathExpLossRatio = 0.1;
 
     /*
+        死亡后回到城镇时恢复的最大血量比例。
+        死亡不再是"原地满血复活"，需要重新打怪回血。
+    */
+    public const double DeathHpRestoreRatio = 0.5;
+
+    /*
+        升级后赠送的草药数量。
+    */
+    public const int HerbsPerLevelUp = 1;
+
+    /*
+        按等级推导的理论最大血量。
+        读档时用它校验存档数值是否自洽（防止手改存档导致属性与等级脱节）。
+    */
+    public static double MaxHpForLevel(int level) => 100 + (level - 1) * MaxHpPerLevel;
+
+    /*
+        按等级推导的理论攻击力。
+    */
+    public static double AttackForLevel(int level) => 15 + (level - 1) * AttackPerLevel;
+
+    /*
         把数值限制在安全区间内，防止读档或运算产生非法数值。
     */
     public static void ClampValues()
     {
         if (Level < 1) Level = 1;
-        if (MaxHp <= 0) MaxHp = 100;
-        if (Attack <= 0) Attack = 15;
+        if (MaxHp <= 0) MaxHp = MaxHpForLevel(Level);
+        if (Attack <= 0) Attack = AttackForLevel(Level);
         if (Exp < 0) Exp = 0;
         if (Hp < 0) Hp = 0;
         if (Hp > MaxHp) Hp = MaxHp;
+        if (Herbs < 0) Herbs = 0;
+        if (Herbs > MaxHerbs) Herbs = MaxHerbs;
+    }
+
+    /*
+        获得草药（受上限限制）。
+        返回实际增加的数量。
+    */
+    public static int AddHerbs(int amount)
+    {
+        if (amount <= 0) return 0;
+
+        int before = Herbs;
+        Herbs = Math.Min(MaxHerbs, Herbs + amount);
+        return Herbs - before;
+    }
+
+    /*
+        消耗 1 株草药。
+        没有草药时返回 false。
+    */
+    public static bool UseHerb()
+    {
+        if (Herbs <= 0) return false;
+
+        Herbs--;
+        return true;
     }
 }

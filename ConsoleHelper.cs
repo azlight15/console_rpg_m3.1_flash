@@ -16,6 +16,26 @@ public static class ConsoleHelper
     public static bool InputEnded { get; private set; }
 
     /*
+        标记标准输入已结束。
+        供各模块在发现 ReadLine 返回 null 时主动调用，
+        避免"读到 null 之后继续循环"造成的死循环。
+    */
+    public static void MarkInputEnded()
+    {
+        InputEnded = true;
+    }
+
+    /*
+        重置输入结束标记。
+        读档会替换掉整个玩家状态，等同于一次新的开始，
+        此时若之前只是因为重定向输入读到末尾，应该允许重新尝试读取。
+    */
+    public static void ResetInputEnded()
+    {
+        InputEnded = false;
+    }
+
+    /*
         清屏。
         在没有真实控制台（例如输出被重定向）时 Console.Clear 会抛出异常，这里做兜底处理。
     */
@@ -38,7 +58,16 @@ public static class ConsoleHelper
     {
         if (!Console.IsInputRedirected)
         {
-            return Console.ReadKey().KeyChar;
+            try
+            {
+                return Console.ReadKey().KeyChar;
+            }
+            catch (InvalidOperationException)
+            {
+                // 没有可用的控制台输入，退化为读取一行文本
+                MarkInputEnded();
+                return '\0';
+            }
         }
 
         string? line = Console.ReadLine();
@@ -46,7 +75,7 @@ public static class ConsoleHelper
         // 输入流已结束（EOF），标记后由调用方决定退出
         if (line == null)
         {
-            InputEnded = true;
+            MarkInputEnded();
             return '\0';
         }
 
@@ -67,12 +96,19 @@ public static class ConsoleHelper
         {
             if (Console.ReadLine() == null)
             {
-                InputEnded = true;
+                MarkInputEnded();
             }
 
             return;
         }
 
-        Console.ReadKey();
+        try
+        {
+            Console.ReadKey();
+        }
+        catch (InvalidOperationException)
+        {
+            MarkInputEnded();
+        }
     }
 }

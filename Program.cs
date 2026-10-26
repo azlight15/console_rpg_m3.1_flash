@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Console_RPG;
 
@@ -8,8 +9,15 @@ namespace Console_RPG;
 */
 public static class Program
 {
-    // 控制游戏是否继续运行
-    private static bool _running = true;
+    // 玩家名字最大长度
+    private const int MaxNameLength = 16;
+
+    // 打坐修炼的基础收益与连续打坐的递减幅度
+    private const int MeditationBaseExp = 40;
+    private const int MeditationDecay = 10;
+
+    // 连续打坐次数（收益递减计数）
+    private static int _meditationStreak = 0;
 
     /*
         游戏入口方法
@@ -17,21 +25,24 @@ public static class Program
     */
     private static void Main()
     {
-        StartMenu();     // 输入玩家名字
+        // 输入流已结束（例如以重定向方式运行）时无法开始游戏
+        if (!StartMenu())
+        {
+            return;
+        }
+
         GameConfirmed(); // 显示初始状态确认
 
         // 游戏主循环
-        while (_running)
-        {
-            OptionsMenu();
-        }
+        OptionsMenu();
     }
 
     /*
         开始菜单
         负责获取玩家名字并做基本校验
+        返回 false 表示标准输入已结束，游戏无法继续
     */
-    private static void StartMenu()
+    private static bool StartMenu()
     {
         ConsoleHelper.Clear();
         Console.WriteLine("===== 欢迎来玩Console RPG游戏 =====");
@@ -41,16 +52,57 @@ public static class Program
         Console.WriteLine("=================================");
         Console.Write("请输入你的名字（取了名字后不能更改！）：");
 
-        PlayerStatistics.Name = Console.ReadLine()!;
-
-        // 防止输入空字符串或空格
-        while (string.IsNullOrWhiteSpace(PlayerStatistics.Name))
+        while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("\n不能只输入空格或直接回车！请重新输入你的名字：");
-            Console.ResetColor();
-            PlayerStatistics.Name = Console.ReadLine()!;
+            string? input = Console.ReadLine();
+
+            // 标准输入已结束：标记并退出，避免陷入"反复读到 null"的死循环
+            if (input == null)
+            {
+                ConsoleHelper.MarkInputEnded();
+                Console.WriteLine();
+                Console.WriteLine("检测到输入已结束，游戏无法继续。");
+                return false;
+            }
+
+            string name = SanitizeName(input);
+
+            // 防止输入空字符串或空格
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("\n不能只输入空格或直接回车！请重新输入你的名字：");
+                Console.ResetColor();
+                continue;
+            }
+
+            PlayerStatistics.Name = name;
+            return true;
         }
+    }
+
+    /*
+        清洗玩家名字：
+        去掉首尾空白、剔除控制字符（例如 ANSI 转义序列）、限制最大长度。
+    */
+    private static string SanitizeName(string raw)
+    {
+        StringBuilder sb = new StringBuilder(raw.Length);
+
+        foreach (char c in raw.Trim())
+        {
+            if (char.IsControl(c)) continue;
+            sb.Append(c);
+        }
+
+        string name = sb.ToString().Trim();
+
+        if (name.Length > MaxNameLength)
+        {
+            name = name.Substring(0, MaxNameLength);
+        }
+
+        return name;
     }
 
     /*
@@ -66,6 +118,7 @@ public static class Program
         Console.WriteLine($"等级：{PlayerStatistics.Level}");
         Console.WriteLine($"HP：{PlayerStatistics.Hp:F0}/{PlayerStatistics.MaxHp:F0}");
         Console.WriteLine($"攻击值：{PlayerStatistics.Attack}");
+        Console.WriteLine($"草药：{PlayerStatistics.Herbs} 株（每次治疗消耗 1 株）");
         Console.WriteLine($"那么祝你玩的开心，{PlayerStatistics.Name}勇者！");
         Console.WriteLine("=================================");
         Console.WriteLine("按下任意键开始游戏");
@@ -78,7 +131,7 @@ public static class Program
     */
     private static void OptionsMenu()
     {
-        while (_running)
+        while (true)
         {
             ConsoleHelper.Clear();
             Console.WriteLine("=========================");
@@ -95,15 +148,17 @@ public static class Program
             Console.Write("请选择选项：");
 
             // 使用 TryParse 读取，避免输入非数字时直接抛出异常导致游戏崩溃
-            if (!int.TryParse(Console.ReadLine(), out int options))
-            {
-                // 输入流已结束，无法再读取，直接退出游戏
-                if (ConsoleHelper.InputEnded)
-                {
-                    _running = false;
-                    break;
-                }
+            string? raw = Console.ReadLine();
 
+            // 标准输入已结束：标记后直接退出，避免反复读到 null
+            if (raw == null)
+            {
+                ConsoleHelper.MarkInputEnded();
+                return;
+            }
+
+            if (!int.TryParse(raw, out int options))
+            {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("输入错误，请输入 1~7 之间的数字！");
                 Console.ResetColor();
@@ -128,7 +183,7 @@ public static class Program
                     Battle.StartBattle();   // 进入战斗模块
                     break;
                 case 2:
-                    UpLevel.GainExp(60);     // 打坐修炼获得少量经验
+                    Meditate();              // 打坐修炼
                     break;
                 case 3:
                     Rest();                 // 休息治疗
@@ -146,16 +201,48 @@ public static class Program
                     ConsoleHelper.Clear();
                     Console.WriteLine("欢迎再次玩Console RPG，谢谢");
                     Console.WriteLine("那么下次再见，勇者！");
-                    _running = false;       // 结束主循环
-                    break;
+                    return;                  // 结束主循环
             }
 
             // 输入流结束后不再继续刷新菜单
             if (ConsoleHelper.InputEnded)
             {
-                _running = false;
+                return;
             }
         }
+    }
+
+    /*
+        打坐修炼
+        收益随连续打坐次数递减，避免"坐着不动也能稳定刷等级"
+    */
+    private static void Meditate()
+    {
+        ConsoleHelper.Clear();
+
+        int gain = MeditationBaseExp - MeditationDecay * _meditationStreak;
+        if (gain < 0) gain = 0;
+
+        _meditationStreak++;
+
+        if (gain <= 0)
+        {
+            Console.WriteLine("你已精疲力竭，这次打坐没有任何收获。");
+            Console.WriteLine("去打个怪或读个档休息一下吧。");
+        }
+        else
+        {
+            UpLevel.GainExp(gain, pauseWhenNoLevelUp: true);
+        }
+    }
+
+    /*
+        重置打坐的连续计数。
+        打怪之后精力恢复，可以重新从最高收益开始打坐。
+    */
+    public static void ResetMeditation()
+    {
+        _meditationStreak = 0;
     }
 
     /*
@@ -165,15 +252,22 @@ public static class Program
     {
         ConsoleHelper.Clear();
 
-        double recovered = Heal.HealPlayer();
-
-        if (recovered <= 0)
+        if (PlayerStatistics.Hp >= PlayerStatistics.MaxHp)
         {
             Console.WriteLine("你的HP已满，无需治疗");
         }
+        else if (PlayerStatistics.Herbs <= 0)
+        {
+            Console.WriteLine("你没有草药了，无法治疗");
+            Console.WriteLine("去打个怪打点草药回来吧。");
+        }
+        else if (Heal.TryHeal(out double recovered))
+        {
+            Console.WriteLine($"你使用了一株草药，恢复 {recovered:F0} HP（剩余草药 {PlayerStatistics.Herbs}）");
+        }
         else
         {
-            Console.WriteLine($"你治疗了自己，恢复 {recovered:F0} HP");
+            Console.WriteLine("治疗失败，你没有草药了");
         }
 
         Program.Loading();

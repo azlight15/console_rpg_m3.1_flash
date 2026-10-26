@@ -23,6 +23,9 @@ public static class MonsterFactory
     // 精英怪属性倍率
     private const double EliteMultiplier = 1.5;
 
+    // 普通怪掉落草药的概率（35%）
+    private const int HerbDropChance = 35;
+
     /*
         对外提供获取怪物的入口
         每次访问都会创建一个新的怪物实例
@@ -85,6 +88,13 @@ public static class MonsterFactory
             monster.MaxHp *= EliteMultiplier;
             monster.Attack *= EliteMultiplier;
             monster.ExpReward *= EliteMultiplier;
+
+            // 精英怪必掉 2 株草药
+            monster.HerbDrop = 2;
+        }
+        else if (Random.Shared.Next(100) < HerbDropChance)
+        {
+            monster.HerbDrop = 1;
         }
 
         // 初始化当前血量
@@ -103,20 +113,20 @@ public static class MonsterFactory
         switch (type)
         {
             case 1:
-                monster.MaxHp = 30 + level * 4;
-                monster.Attack = 5 + level * 1;
+                monster.MaxHp = 30 + level * 5;
+                monster.Attack = 5 + level * 2;
                 monster.ExpReward = 30 + level * 12;
                 break;
 
             case 2:
-                monster.MaxHp = 50 + level * 5;
-                monster.Attack = 8 + level * 2;
+                monster.MaxHp = 50 + level * 7;
+                monster.Attack = 8 + level * 3;
                 monster.ExpReward = 50 + level * 16;
                 break;
 
             case 3:
-                monster.MaxHp = 70 + level * 6;
-                monster.Attack = 10 + level * 3;
+                monster.MaxHp = 70 + level * 9;
+                monster.Attack = 10 + level * 4;
                 monster.ExpReward = 70 + level * 20;
                 break;
         }

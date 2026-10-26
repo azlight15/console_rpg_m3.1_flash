@@ -7,11 +7,11 @@ namespace Console_RPG;
 public static class GameInfo
 {
     // 版本号（遵循 语义化版本：主版本.次版本.修订号）
-    public const string Version = "1.1.0";
+    public const string Version = "1.1.1";
 
     // 版本名称，用于界面显示
     public const string VersionName = "Flash";
 
-    // 完整的版本标识，例如 "Flash v1.1.0"
+    // 完整的版本标识，例如 "Flash v1.1.1"
     public const string FullVersion = $"{VersionName} v{Version}";
 }

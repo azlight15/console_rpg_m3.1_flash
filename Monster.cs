@@ -7,10 +7,11 @@ namespace Console_RPG;
 */
 public class MonsterStatistics
 {
-    public string Name = "";   // 怪物名字
-    public int Level;         // 怪物等级
-    public double Hp;         // 当前血量
-    public double MaxHp;      // 最大血量
-    public double Attack;     // 攻击力
-    public double ExpReward;  // 击败后给予玩家的经验值
+    public string Name { get; set; } = "";   // 怪物名字
+    public int Level { get; set; }           // 怪物等级
+    public double Hp { get; set; }           // 当前血量
+    public double MaxHp { get; set; }        // 最大血量
+    public double Attack { get; set; }       // 攻击力
+    public double ExpReward { get; set; }    // 击败后给予玩家的经验值
+    public int HerbDrop { get; set; }        // 击败后掉落的草药数量
 }
